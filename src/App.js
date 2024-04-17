@@ -8,13 +8,13 @@ import NewsFeed from "./components/NewsFeed";
 import WeatherWidget from "./components/WeatherWidget";
 import FinanceWidget from "./components/FinanceWidget";
 import Footer from "./components/Footer";
-
+import Home from './components/Home';
 function App() {
   return (
     <ChakraProvider theme={theme}>
       <Header />
       <Routes>
-        <Route path="/" element={<NewsFeed />} />
+        <Route path="/" element={<Home />} />
         <Route path="/news" element={<NewsFeed />} />
         <Route path="/finance" element={<FinanceWidget />} />
         <Route path="/weather" element={<WeatherWidget />} />

@@ -1,0 +1,22 @@
+/* Add this CSS to your styles.css file or within a <style> tag in your HTML */
+
+@keyframes moveTicker {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .ticker-container {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  
+  .ticker-item {
+    display: inline-block;
+    padding-left: 100%; /* Make sure the ticker starts offscreen */
+    animation: moveTicker 20s linear infinite; /* Adjust the timing as needed */
+  }
+  
