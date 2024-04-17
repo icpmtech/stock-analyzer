@@ -1,5 +1,5 @@
 // SearchBar.js
-import { Input, Flex, Icon } from "@chakra-ui/react";
+import { Input, Flex, Icon, Button } from "@chakra-ui/react";
 import { MdSearch } from "react-icons/md";
 
 const SearchBar = ({ value, onChange }) => {
@@ -12,7 +12,7 @@ const SearchBar = ({ value, onChange }) => {
         size="lg"
         mr={2}
       />
-      <Icon as={MdSearch} w={6} h={6} />
+     <Button><Icon as={MdSearch} w={6} h={6} /></Button> 
     </Flex>
   );
 };

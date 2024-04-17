@@ -6,7 +6,7 @@ import {
   Heading,
   useColorModeValue
 } from '@chakra-ui/react';
-import SearchBar from './SearchBar';
+
 import MarketNewsFeed from './MarketNewsFeed';
 import StockSummaryList from './StockSummaryList';
 import MarketTicker from './MarketTicker';
@@ -31,7 +31,10 @@ const fakeStockData = [
   },
   // ... more stocks
 ];
-
+const tickerData = [
+  { label: 'S&P Futures', value: '5,115.25', change: '+227.5 (0.4467%)', isPositive: true },
+  // ...other tickerData items
+];
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   // Initialize the state with the mock data
@@ -46,18 +49,18 @@ const Home = () => {
 
   return (
     <Box bg={bgColor} minH="100vh" p={5}>
-      <SearchBar value={searchQuery} onChange={handleChange} />
-      <MarketTicker /> 
+     
+      <MarketTicker tickerData={tickerData} /> 
       <Grid
         templateColumns={{ md: '3fr 1fr', base: '1fr' }}
-        gap={6}
+        gap={4}
         my={6}
       >
-        <GridItem colSpan={2}>
+        <GridItem>
           <Heading mb={4}>Market News</Heading>
           <MarketNewsFeed newsList={marketNews} />
         </GridItem>
-        <GridItem colSpan={1}>
+        <GridItem >
           <Heading mb={4}>Stock Summary</Heading>
           <StockSummaryList stocks={stockData} />
         </GridItem>
