@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Flex, Text, Link as ChakraLink } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import StockSearchComponent from './StockSearchComponent';
+import StockSearchTiingoComponent from './StockSearchTiingoComponent';
 function Header() {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -12,9 +12,9 @@ function Header() {
   const handleChange = (event) => setSearchQuery(event.target.value);
   return (
     <Flex  p={4} justifyContent="space-between" alignItems="center">
-      <Text fontSize="lg" fontWeight="bold">Yahoo Dashboard</Text>
+      <Text fontSize="lg" fontWeight="bold">Stock Analizer</Text>
       <Flex>
-      <StockSearchComponent  />
+      <StockSearchTiingoComponent  />
         </Flex>
       <Flex>
         <ChakraLink as={Link} to="/" p={2} style={{ textDecoration: 'none' }}>Home</ChakraLink>
