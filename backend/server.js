@@ -434,6 +434,64 @@ app.get('/api/news', async (req, res) => {
     }
 });
 
+
+  /**
+     * @swagger
+     * /api/stock/{symbol}:
+     *   get:
+     *     summary: Retrieve stock details from IEX Cloud
+     *     description: Returns stock details including latest price, volume etc.
+     *     parameters:
+     *       - in: path
+     *         name: symbol
+     *         required: true
+     *         description: Stock symbol to fetch details for (e.g. AAPL, GOOGL, etc.)
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: A successful response with stock data
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 symbol:
+     *                   type: string
+     *                 companyName:
+     *                   type: string
+     *                 primaryExchange:
+     *                   type: string
+     *                 latestPrice:
+     *                   type: number
+     *                 latestSource:
+     *                   type: string
+     *                 latestTime:
+     *                   type: string
+     *       404:
+     *         description: Stock not found
+     *       500:
+     *         description: Internal server error
+     */
+app.get('/api/stock/:symbol', async (req, res) => {
+    const symbol = req.params.symbol;
+    const token = process.env.IEX_API_TOKEN;
+    try {
+        const url = `https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${token}`;
+        const response = await axios.get(url);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Failed to fetch stock data:', error);
+        if (error.response) {
+            res.status(error.response.status).send(error.response.data);
+        } else {
+            res.status(500).send("Error connecting to IEX Cloud");
+        }
+    }
+});
+
+
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

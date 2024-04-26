@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import MarketNewsFeed from './MarketNewsFeed';
 import StockSummaryList from './StockSummaryList';
+ import StockStats from './StockStats';
 const StockSearchComponent = () => {
     const [searchQuery, setSearchQuery] = useState('NASDAQ');
     const [results, setResults] = useState(null);
@@ -116,7 +117,7 @@ const StockSearchComponent = () => {
         setLoading(true);
         
         try {
-            const response = await axios.get(`http://localhost:3001/api/stock-details/${stock.symbol}`);
+            const response = await axios.get(`http://localhost:3001/api/stock/${stock.symbol}`);
             setResults(response.data);
             setShowResults(true);
         } catch (err) {
@@ -158,17 +159,7 @@ const StockSearchComponent = () => {
                     ))}
                 </Box>
             )}
-            {showResults && results && (
-                <Box mt={4}>
-                    <Text fontWeight="bold">{results.name} ({results.ticker})</Text>
-                    <Text>Open Today: {results.open}</Text>
-                    <Text>High Today: {results.high}</Text>
-                    <Text>Low Today: {results.low}</Text>
-                    <Text>Last: {results.last}</Text>
-                    <Text>Prev Close: {results.prevClose}</Text>
-                    <Button onClick={handleClose} colorScheme="red">Close</Button>
-                </Box>
-            )}
+           
               <Grid
         templateColumns={{ md: '3fr 1fr', base: '1fr' }}
         gap={4}
@@ -180,7 +171,9 @@ const StockSearchComponent = () => {
         </GridItem>
         <GridItem >
           <Heading mb={4}>Stock Summary</Heading>
-          <StockSummaryList stocks={stockData} />
+          {showResults && results && (
+               <StockStats stockData={results} ></StockStats>
+            )}
         </GridItem>
       </Grid>
         </Box>
