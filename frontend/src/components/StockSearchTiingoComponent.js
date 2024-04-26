@@ -49,7 +49,7 @@ const StockSearchComponent = () => {
 
         const fetchMarketNews = async () => {
             try {
-                
+                setLoading(true);
                 const newsResponse = await axios.get(`http://localhost:3001/api/news?search=${searchQuery}`);
                 setMarketNews(newsResponse.data.articles.results.map(article => ({
                     id: article.uri,
@@ -64,6 +64,7 @@ const StockSearchComponent = () => {
                 console.error('Error fetching market news:', error);
                 setError('Failed to fetch market news');
             }
+            setLoading(false);
         };
 
         fetchStockData();

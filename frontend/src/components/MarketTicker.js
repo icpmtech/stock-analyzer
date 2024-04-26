@@ -9,13 +9,12 @@ const TickerItem = ({ label, value, change, isPositive }) => {
   const changeColor = useColorModeValue(isPositive ? 'green.500' : 'red.500', isPositive ? 'green.200' : 'red.200');
 
   return (
-    <Box  borderWidth="1px">
+    <Box >
      <Spinner
   thickness='4px'
   speed='0.65s'
   emptyColor='gray.200'
   color='blue.500'
-  size='xl'
 />
      <Box className="ticker-item" >
       <Text as="span" fontWeight="bold" color={textColor}>
