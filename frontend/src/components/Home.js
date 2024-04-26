@@ -85,7 +85,7 @@ const Home = () => {
   const handleChange = (event) => setSearchQuery(event.target.value);
 
   return (
-    <Box bg={bgColor} minH="100vh" p={5}>
+    <Box boxShadow="lg" bg={bgColor} minH="100vh" p={5}>
       <MarketTicker tickerData={[{
         label: 'AAPL',
         value: stockData.length > 0 ? stockData[0].price : 'Loading...',
@@ -97,7 +97,7 @@ const Home = () => {
         gap={4}
         my={6}
       >
-        <GridItem>
+        <GridItem >
           <Heading mb={4}>Market News</Heading>
           <MarketNewsFeed newsList={marketNews} />
         </GridItem>

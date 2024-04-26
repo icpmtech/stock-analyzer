@@ -2,14 +2,22 @@
 import React from 'react';
 import { Box,Card, Text, useColorModeValue } from '@chakra-ui/react';
 import '../styles.css'; // Assuming your styles are saved in this file
+import { Spinner } from '@chakra-ui/react'
 
 const TickerItem = ({ label, value, change, isPositive }) => {
   const textColor = useColorModeValue('gray.700', 'gray.100');
   const changeColor = useColorModeValue(isPositive ? 'green.500' : 'red.500', isPositive ? 'green.200' : 'red.200');
 
   return (
-    <Box className="ticker-item" mr="4">
-     
+    <Box  borderWidth="1px">
+     <Spinner
+  thickness='4px'
+  speed='0.65s'
+  emptyColor='gray.200'
+  color='blue.500'
+  size='xl'
+/>
+     <Box className="ticker-item" >
       <Text as="span" fontWeight="bold" color={textColor}>
         {label}:
       </Text>
@@ -18,7 +26,8 @@ const TickerItem = ({ label, value, change, isPositive }) => {
       </Text>
       <Text as="span" color={changeColor}>
         {change}
-      </Text>
+      </Text></Box>
+      
      
     </Box>
   );
