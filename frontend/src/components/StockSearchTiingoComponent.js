@@ -166,7 +166,7 @@ const StockSearchComponent = () => {
         my={6}
       >
         <GridItem >
-          <Heading mb={4}>Market News</Heading>
+          <Heading mb={4}>Market News: ({results.companyName})</Heading>
           <MarketNewsFeed newsList={marketNews} />
         </GridItem>
         <GridItem >

@@ -441,6 +441,7 @@ app.get('/api/news', async (req, res) => {
      *   get:
      *     summary: Retrieve stock details from IEX Cloud
      *     description: Returns stock details including latest price, volume etc.
+     *     tags: [Stock Details from IEX Cloud]
      *     parameters:
      *       - in: path
      *         name: symbol
