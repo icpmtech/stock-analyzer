@@ -2,16 +2,73 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, Button, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import SearchBar from './SearchBar';  // Ensure that SearchBar properly handles the props and events.
 import axios from 'axios';
-
+import {
+  Grid,
+  GridItem,
+  Heading,
+  useColorModeValue
+} from '@chakra-ui/react';
+import MarketNewsFeed from './MarketNewsFeed';
+import StockSummaryList from './StockSummaryList';
 const StockSearchComponent = () => {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState('NASDAQ');
     const [results, setResults] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showResults, setShowResults] = useState(true);
+    const [marketNews, setMarketNews] = useState([]);
+    const [stockData, setStockData] = useState([]);
+  
+    const apiKey = 'SF6UH88CL3UM7VXA'; // Replace with your actual API key
+    const apiKeyNews = '8d817453-4629-4de5-a13d-3e9130fbd020';
+  
+    useEffect(() => {
+        if (!searchQuery) return;  // Don't fetch if the search query is empty
 
+        const fetchStockData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${searchQuery}&apikey=${apiKey}`);
+                const stockData = response.data['Time Series (Daily)'];
+                const latestDate = Object.keys(stockData)[0];
+                const latestData = stockData[latestDate];
+                setStockData([{
+                    symbol: searchQuery,
+                    name: searchQuery,  // You might want to fetch this from a more detailed endpoint
+                    price: latestData['4. close'],
+                    change: `${(latestData['4. close'] - latestData['1. open']).toFixed(2)} (${((latestData['4. close'] - latestData['1. open']) / latestData['1. open'] * 100).toFixed(2)}%)`,
+                }]);
+            } catch (error) {
+                console.error('Error fetching stock data:', error);
+                setError('Failed to fetch stock data');
+            }
+            setLoading(false);
+        };
+
+        const fetchMarketNews = async () => {
+            try {
+                
+                const newsResponse = await axios.get(`http://localhost:3001/api/news?search=${searchQuery}`);
+                setMarketNews(newsResponse.data.articles.results.map(article => ({
+                    id: article.uri,
+                    title: article.title,
+                    url: article.url,
+                    publishedDate: article.dateTimePub,
+                    imageUrl: article.image || 'default_image_url',
+                    summary: article.body,
+                    source: article.source.title
+                })));
+            } catch (error) {
+                console.error('Error fetching market news:', error);
+                setError('Failed to fetch market news');
+            }
+        };
+
+        fetchStockData();
+        fetchMarketNews();
+    }, [searchQuery]);  // Re-run these effects when searchQuery changes
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (!event.target.closest("#autocomplete-container")) {
@@ -111,7 +168,22 @@ const StockSearchComponent = () => {
                     <Button onClick={handleClose} colorScheme="red">Close</Button>
                 </Box>
             )}
+              <Grid
+        templateColumns={{ md: '3fr 1fr', base: '1fr' }}
+        gap={4}
+        my={6}
+      >
+        <GridItem >
+          <Heading mb={4}>Market News</Heading>
+          <MarketNewsFeed newsList={marketNews} />
+        </GridItem>
+        <GridItem >
+          <Heading mb={4}>Stock Summary</Heading>
+          <StockSummaryList stocks={stockData} />
+        </GridItem>
+      </Grid>
         </Box>
+      
     );
 };
 

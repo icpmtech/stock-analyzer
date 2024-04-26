@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Stock Analizer",
+  "name": "Stock Analizer",
   "icons": [
     {
       "src": "favicon.ico",

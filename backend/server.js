@@ -12,9 +12,9 @@ const options = {
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "NASDAQ Data Link API",
+            title: "Stock Analizer Data Link API",
             version: "1.0.0",
-            description: "A simple Express API to fetch data from NASDAQ"
+            description: "A simple Express API to fetch data to by used by Stock Analizer React App"
         },
         servers: [
             {
@@ -301,6 +301,138 @@ app.get('/api/search-stocks', async (req, res) => {
 });
 
 
+/**
+ * @swagger
+ * /api/articles:
+ *   get:
+ *     summary: Retrieves articles based on query
+ *     description: Fetches articles using an external News API.
+ *     tags: [News API Org]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Keyword to search for in articles
+ *     responses:
+ *       200:
+ *         description: A list of articles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 articles:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       source:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                       author:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                       urlToImage:
+ *                         type: string
+ *                       publishedAt:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ */
+
+app.get('/api/articles', async (req, res) => {
+    const query = req.query.query || 'default';  // Default query if none provided
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${process.env.NEWS_API_KEY}`;
+
+    try {
+        const response = await axios.get(url);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Failed to fetch articles:', error);
+        res.status(500).json({ message: 'Failed to fetch articles' });
+    }
+});
+
+/**
+ * @swagger
+ * /api/news:
+ *   get:
+ *     summary: Retrieves news articles based on a search query.
+ *     description: Fetches articles from an external news source.
+ *     tags: [News API AI]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Keyword to search for in the news articles, defaults to 'stock markets'.
+ *     responses:
+ *       200:
+ *         description: An array of news articles.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 articles:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                       imageUrl:
+ *                         type: string
+ *                       publishedAt:
+ *                         type: string
+ *       500:
+ *         description: Failed to fetch news articles.
+ */
+
+app.get('/api/news', async (req, res) => {
+    const searchQuery = req.query.search || 'stock markets'; // Default to 'stock markets' if no search query provided
+    const apiKeyNews = process.env.NEWS_AI_API_KEY; // Assume you have your API key stored in an environment variable
+
+    const params = {
+        query: JSON.stringify({
+            "$query": {
+                "$and": [
+                    {"keyword": searchQuery, "keywordLoc": "body"},
+                    {"lang": "eng"}
+                ]
+            },
+            "$filter": {"forceMaxDataTimeWindow": "31"}
+        }),
+        resultType: "articles",
+        articlesSortBy: "date",
+        includeArticleImage: true,
+        apiKey: apiKeyNews
+    };
+
+    try {
+        const response = await axios.get("https://www.newsapi.ai/api/v1/article/getArticles", { params });
+        res.json(response.data); // Send response back to client
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        res.status(500).json({ message: 'Failed to fetch news', error: error.toString() });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
