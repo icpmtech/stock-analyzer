@@ -1,11 +1,15 @@
 require('dotenv').config();
+const OpenAI = require('openai');
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
-
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 const app = express();
+app.use(express.json());
 app.use(cors());
 
 const options = {
@@ -490,8 +494,54 @@ app.get('/api/stock/:symbol', async (req, res) => {
         }
     }
 });
-
-
+/**
+ * @swagger
+ * /openai/chat:
+ *   post:
+ *     summary: Generate chat completion using OpenAI.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userMessage:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successful response with chat completion.
+ *       '500':
+ *         description: Internal server error.
+ */
+app.post('/openai/chat', async (req, res) => {
+    try {
+      const { userMessage } = req.body;
+  
+      // Constructing the messages array
+      const messages = [
+        {
+          "role": "user",
+          "content": userMessage
+        }
+      ];
+  
+      const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+        temperature: 1,
+        max_tokens: 256,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+      });
+  
+      res.json(response);
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'An error occurred while processing the request' });
+    }
+  });
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -20,33 +20,13 @@ const StockSearchComponent = () => {
     const [error, setError] = useState(null);
     const [showResults, setShowResults] = useState(true);
     const [marketNews, setMarketNews] = useState([]);
-    const [stockData, setStockData] = useState([]);
   
-    const apiKey = 'SF6UH88CL3UM7VXA'; // Replace with your actual API key
-    const apiKeyNews = '8d817453-4629-4de5-a13d-3e9130fbd020';
+  
   
     useEffect(() => {
         if (!searchQuery) return;  // Don't fetch if the search query is empty
 
-        const fetchStockData = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${searchQuery}&apikey=${apiKey}`);
-                const stockData = response.data['Time Series (Daily)'];
-                const latestDate = Object.keys(stockData)[0];
-                const latestData = stockData[latestDate];
-                setStockData([{
-                    symbol: searchQuery,
-                    name: searchQuery,  // You might want to fetch this from a more detailed endpoint
-                    price: latestData['4. close'],
-                    change: `${(latestData['4. close'] - latestData['1. open']).toFixed(2)} (${((latestData['4. close'] - latestData['1. open']) / latestData['1. open'] * 100).toFixed(2)}%)`,
-                }]);
-            } catch (error) {
-                console.error('Error fetching stock data:', error);
-                setError('Failed to fetch stock data');
-            }
-            setLoading(false);
-        };
+       
 
         const fetchMarketNews = async () => {
             try {
@@ -68,7 +48,7 @@ const StockSearchComponent = () => {
             setLoading(false);
         };
 
-        fetchStockData();
+       
         fetchMarketNews();
     }, [searchQuery]);  // Re-run these effects when searchQuery changes
     useEffect(() => {
