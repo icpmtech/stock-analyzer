@@ -12,7 +12,7 @@ import MarketNewsFeed from './MarketNewsFeed';
 import StockSummaryList from './StockSummaryList';
  import StockStats from './StockStats';
 const StockSearchComponent = () => {
-    const [searchQuery, setSearchQuery] = useState('NASDAQ');
+    const [searchQuery, setSearchQuery] = useState('AAPL');
     const [results, setResults] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -166,7 +166,7 @@ const StockSearchComponent = () => {
         my={6}
       >
         <GridItem >
-          <Heading mb={4}>Market News: ({results.companyName})</Heading>
+          <Heading mb={4}>Market News: ({results?.companyName})</Heading>
           <MarketNewsFeed newsList={marketNews} />
         </GridItem>
         <GridItem >
