@@ -1,5 +1,6 @@
 require('dotenv').config();
 const OpenAI = require('openai');
+const OpenAI = require('openai');
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -8,7 +9,11 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 const app = express();
+app.use(express.json());
 app.use(express.json());
 app.use(cors());
 
@@ -542,6 +547,81 @@ app.post('/openai/chat', async (req, res) => {
       res.status(500).json({ error: 'An error occurred while processing the request' });
     }
   });
+
+/**
+ * @swagger
+ * /search-dividends:
+ *   get:
+ *     summary: List all dividends for a stock
+ *     description: Retrieves a list of all dividend payments for a specified stock ticker, optionally from a specified start date.
+ *     parameters:
+ *       - in: query
+ *         name: ticker
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Stock ticker symbol to retrieve dividends for
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: '2000-01-01'
+ *         required: false
+ *         description: Start date to filter dividends from (inclusive)
+ *     responses:
+ *       200:
+ *         description: A list of dividends
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     example: '2024-01-15'
+ *                   dividend:
+ *                     type: number
+ *                     example: 0.22
+ *       400:
+ *         description: Bad request, ticker symbol is missing
+ *       404:
+ *         description: No dividend information found
+ *       500:
+ *         description: Server error or unable to fetch data from the API
+ */
+app.get('/search-dividends', async (req, res) => {
+    const { ticker,from  } = req.query;
+    if (!ticker) {
+        return res.status(400).json({ error: 'Ticker symbol is required' });
+    }
+     // Defaulting to a specific date if 'from' is not provided
+     const startDate = from || '2000-01-01';
+    const EODHD_API_KEY = process.env.EODHD_API_KEY;
+    const EODHD_BASE_URL = 'https://eodhd.com/api/div';
+    try {
+        const response = await axios.get(`${EODHD_BASE_URL}/${ticker}.US`, {
+            params: {
+                api_token: 'demo',
+                fmt: 'json',
+                from: startDate
+            }
+        });
+        const dividends = response.data;
+        if (dividends && dividends.length > 0) {
+            res.json(dividends);  // Returns the latest dividend entry
+        } else {
+            res.status(404).json({ error: 'No dividend information found for the specified ticker' });
+        }
+    } catch (error) {
+        res.status(500).json({ errorCall: 'Failed to fetch data from EOD Historical Data API'+ error });
+    }
+});
+
+
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

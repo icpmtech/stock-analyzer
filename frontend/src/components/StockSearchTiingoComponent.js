@@ -9,8 +9,9 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import MarketNewsFeed from './MarketNewsFeed';
-import StockSummaryList from './StockSummaryList';
+import StockChart from './StockChart';
  import StockStats from './StockStats';
+ 
 const StockSearchComponent = () => {
     const [searchQuery, setSearchQuery] = useState('AAPL');
     const [results, setResults] = useState(null);
@@ -92,7 +93,7 @@ const StockSearchComponent = () => {
     };
 
     const selectStock = async (stock) => {
-        setSearchQuery(stock.name);
+        setSearchQuery(stock.symbol);
         setShowSuggestions(false);
         setLoading(true);
         
@@ -152,7 +153,8 @@ const StockSearchComponent = () => {
         <GridItem >
           <Heading mb={4}>Stock Summary</Heading>
           {showResults && results && (
-               <StockStats stockData={results} ></StockStats>
+            <> <StockStats stockData={results} ></StockStats>
+            <StockChart symbol={searchQuery} /></> 
             )}
         </GridItem>
       </Grid>
