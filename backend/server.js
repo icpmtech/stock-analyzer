@@ -1,14 +1,11 @@
 require('dotenv').config();
 const OpenAI = require('openai');
-const OpenAI = require('openai');
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
