@@ -47,13 +47,13 @@ const PortfolioHoldings = ({ holdings }) => {
 
   const handleSaveEdit = (index) => {
     // Get existing holdings from local storage
-    const existingHoldings = JSON.parse(localStorage.getItem('holdings')) || [];
+    const existingHoldings = JSON.parse(localStorage.getItem('holdingsData')) || [];
   
     // Update the holding at the specified index with the edited holding
     existingHoldings[index] = editedHolding;
   
     // Update local storage with the updated holdings array
-    localStorage.setItem('holdings', JSON.stringify(existingHoldings));
+    localStorage.setItem('holdingsData', JSON.stringify(existingHoldings));
   
     // Clear the edit index
     setEditIndex(null);
@@ -86,13 +86,13 @@ const PortfolioHoldings = ({ holdings }) => {
 
   const handleSaveCreate = () => {
     // Get existing holdings from local storage or initialize an empty array if no data exists
-    const existingHoldings = JSON.parse(localStorage.getItem('holdings')) || [];
+    const existingHoldings = JSON.parse(localStorage.getItem('holdingsData')) || [];
   
     // Add the new holding to the existing holdings array
     const updatedHoldings = [...existingHoldings, editedHolding];
   
     // Update local storage with the updated holdings array
-    localStorage.setItem('holdings', JSON.stringify(updatedHoldings));
+    localStorage.setItem('holdingsData', JSON.stringify(updatedHoldings));
   
     // Exit create mode
     setIsCreateMode(false);

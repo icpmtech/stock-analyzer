@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { ChakraProvider } from "@chakra-ui/react";
 import { Routes, Route } from "react-router-dom";
 import theme from "./theme";
@@ -25,11 +25,13 @@ const holdingsData = [
     totalDividendIncome: "--",
     todaysGain: "+0.5000 (+0.1524%)",
     totalGain: "-9.3000 (-2.7531%)",
-    totalReturn: "--"
+    totalReturn: "--",
+    marketValueTrend: [7200, 7300, 7400, 7450, 7500] 
   },
   // Add more holdings as needed...
 ];
 function App() {
+ 
   return (
     <ChakraProvider theme={theme}>
       <Header />
@@ -39,7 +41,7 @@ function App() {
         <Route path="/finance" element={<FinanceWidget />} />
         <Route path="/weather" element={<WeatherWidget />} />
         <Route path="/stock-chart" element={<StockChart symbol="AAPL" />} />
-        <Route path="/holdings" element={  <StockHoldings holdings={holdingsData} /> } />
+        <Route path="/holdings" element={  <StockHoldings holdingsData={holdingsData} /> } />
         <Route path="/login" element={  <LoginForm /> } />
         <Route path="/register" element={  <RegisterForm /> } />
        

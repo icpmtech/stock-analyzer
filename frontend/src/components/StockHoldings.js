@@ -1,15 +1,36 @@
-import React  from 'react';
+import React,{ useState, useEffect }  from 'react';
 import { Box,Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import PortfolioStats  from  './portfolio/PortfolioStats';
 import PortfolioFundamentals  from  './portfolio/PortfolioFundamentals';
 import PortfolioHoldings  from  './portfolio/PortfolioHoldings';
 import PortfolioSummary  from  './portfolio/PortfolioSummary';
-const StockHoldings = ({ holdings }) => {
+const StockHoldings = ({holdingsData}) => {
+
+  const [holdings, setHoldings] = useState(holdingsData);
+
+  // Load data from local storage when the component mounts
+  useEffect(() => {
+    const loadedHoldings = localStorage.getItem('holdingsData');
+    if (loadedHoldings) {
+      setHoldings(JSON.parse(loadedHoldings));
+    }
+  }, []);
+
+  // Save data to local storage when `holdings` changes
+  useEffect(() => {
+    localStorage.setItem('holdingsData', JSON.stringify(holdings));
+  }, [holdings]);
+
   const statsData = {
     cashHoldings: 6287.89,
     dayGain: { value: "+66.85", percentage: "+1.07" },
     totalGain: { value: "-598.85", percentage: "-8.70" },
-    annualPerformance: "^GSPCPortfolio"
+    annualPerformance: "^GSPCPortfolio",
+    gainData: {
+      dayGainTrend: [60, 62, 61, 63, 64],
+      totalGainTrend: [-550, -560, -580, -590, -598.85],
+      annualPerformanceTrend: [1.05, 1.06, 1.07, 1.08, 1.09]  // Hypothetical performance index over time
+    }
   };
   const stockData = [
     {
