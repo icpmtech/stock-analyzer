@@ -2,6 +2,8 @@ require('dotenv').config();
 const OpenAI = require('openai');
 const express = require('express');
 const axios = require('axios');
+const puppeteer = require('puppeteer');
+const yahooFinance = require('yahoo-finance2').default;
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
@@ -616,6 +618,106 @@ app.get('/search-dividends', async (req, res) => {
         res.status(500).json({ errorCall: 'Failed to fetch data from EOD Historical Data API'+ error });
     }
 });
+
+/**
+ * @swagger
+ * /stock-price/{symbol}:
+ *   get:
+ *     summary: Retrieve the current stock price
+ *     description: Fetches the current market price of a stock based on the stock symbol provided in the URL path. This endpoint scrapes the price directly from Yahoo Finance.
+ *     parameters:
+ *       - in: path
+ *         name: symbol
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The stock symbol for which the current market price is being retrieved, such as 'AAPL' for Apple Inc.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the stock price
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 symbol:
+ *                   type: string
+ *                   example: 'AAPL'
+ *                 price:
+ *                   type: string
+ *                   example: '150.10'
+ *       400:
+ *         description: Bad request, symbol is missing or invalid
+ *       500:
+ *         description: Server error or unable to fetch the stock price
+ */
+app.get('/stock-price/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    const url = `https://finance.yahoo.com/quote/${symbol}`;
+  
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto(url, { waitUntil: 'networkidle2' });
+      const price = await page.evaluate(() => {
+        const priceElement = document.querySelector('fin-streamer[data-field="regularMarketPrice"]');
+        return priceElement ? priceElement.innerText : 'No price found';
+      });
+      await browser.close();
+      res.send({ symbol, price });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send({ error: 'Failed to fetch stock price' });
+    }
+  });
+
+
+  /**
+ * @openapi
+ * /api/stock-quote/{symbol}:
+ *   get:
+ *     summary: Retrieve stock quotes
+ *     description: Fetches stock quotes by symbol using the yahoo-finance2 library.
+ *     parameters:
+ *       - in: path
+ *         name: symbol
+ *         required: true
+ *         description: Stock symbol to retrieve the quote for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved stock quote
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 symbol:
+ *                   type: string
+ *                 price:
+ *                   type: number
+ *       500:
+ *         description: Error fetching data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
+  app.get('/api/stock-quote/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    try {
+      const quote = await yahooFinance.quote(symbol);
+      res.json(quote);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Failed to retrieve data' });
+    }
+  });
 
 
 

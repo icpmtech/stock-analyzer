@@ -7,7 +7,9 @@
     "express-rate-limit": "^7.2.0",
     "morgan": "^1.10.0",
     "openai": "^4.38.5",
+    "puppeteer": "^22.7.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "yahoo-finance2": "^2.11.2"
   }
 }

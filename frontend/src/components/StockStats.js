@@ -29,11 +29,11 @@ const StockStats = ({ stockData }) => {
       }
     };
 
-    fetchInformation('chat', stockData.companyName, setCompanyDescription);
-    fetchInformation('chat', 'give list dividends to ticker:' + stockData.companyName + ' as Json', json => {
+    fetchInformation('chat', stockData.shortName, setCompanyDescription);
+    fetchInformation('chat', 'give list dividends to ticker:' + stockData.shortName + ' as Json', json => {
       setDividendsInformation(JSON.parse(json)); // Parse and set the state
     });
-  }, [stockData.companyName]);
+  }, [stockData.shortName]);
 
   const toggleDescriptionCollapse = () => {
     setIsOpenDescription(!isOpenDescription);
@@ -44,26 +44,26 @@ const StockStats = ({ stockData }) => {
   };
 
   const {
-    companyName,
-    latestPrice,
-    latestTime,
-    change,
-    changePercent,
-    high,
-    low,
-    volume,
+    shortName,
+    regularMarketPrice ,
+    regularMarketTime , 
+    regularMarketChange,
+    regularMarketChangePercent ,
+    regularMarketDayHigh ,
+    regularMarketDayLow ,
+    regularMarketVolume ,
     marketCap,
-    peRatio,
-    week52High,
-    week52Low,
+    trailingPE ,
+    fiftyTwoWeekHigh ,
+    fiftyTwoWeekLow ,
     ytdChange,
-    isUSMarketOpen
+    marketState
   } = stockData;
-
+  const isUSMarketOpen = marketState === 'REGULAR'
   return (
     <Box borderWidth="1px" borderRadius="lg" p="4">
       <Box mb="4">
-        <Text fontSize="xl" fontWeight="bold">{companyName}</Text>
+        <Text fontSize="xl" fontWeight="bold">{shortName}</Text>
       </Box>
       <Divider my="2" />
       <Box>
@@ -74,7 +74,7 @@ const StockStats = ({ stockData }) => {
       </Box>
       <Box mb="4">
         <IconButton
-          icon={isOpenDescription ? <><Text fontSize="lg" fontWeight="bold">Description</Text> <ChevronUpIcon /></> : <><Text fontSize="lg" fontWeight="bold">AI Description</Text> <ChevronDownIcon /></>}
+          icon={isOpenDescription ? <><Text fontSize="lg" fontWeight="bold">Description</Text> <ChevronUpIcon /></> : <><Text fontSize="lg" fontWeight="bold">Description</Text> <ChevronDownIcon /></>}
           aria-label={isOpenDescription ? 'Collapse' : 'Expand'}
           onClick={toggleDescriptionCollapse}
           variant="ghost"
@@ -97,53 +97,57 @@ const StockStats = ({ stockData }) => {
         />
         <Collapse in={isOpenStatistics} animateOpacity>
           <Box mt="4">
-            <Stat>
-              <StatLabel>Latest Price</StatLabel>
-              <StatNumber>{latestPrice}</StatNumber>
-              <StatHelpText>{latestTime}</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>Change</StatLabel>
-              <StatNumber>{change}</StatNumber>
-              <StatArrow type={change > 0 ? 'increase' : 'decrease'} />
-              <StatHelpText>{changePercent}%</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>High</StatLabel>
-              <StatNumber>{high}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Low</StatLabel>
-              <StatNumber>{low}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Volume</StatLabel>
-              <StatNumber>{volume}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Market Cap</StatLabel>
-              <StatNumber>{marketCap}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>P/E Ratio</StatLabel>
-              <StatNumber>{peRatio}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>52 Week High</StatLabel>
-              <StatNumber>{week52High}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>52 Week Low</StatLabel>
-              <StatNumber>{week52Low}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>YTD Change</StatLabel>
-              <StatNumber>{ytdChange}</StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Market Status</StatLabel>
-              <StatNumber>{isUSMarketOpen ? 'Open' : 'Closed'}</StatNumber>
-            </Stat>
+          <Stat>
+        <StatLabel>Company Name</StatLabel>
+        <StatNumber>{shortName}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>Latest Price</StatLabel>
+        <StatNumber>${regularMarketPrice.toFixed(2)}</StatNumber>
+        <StatHelpText>{new Date(regularMarketTime * 1000).toLocaleString()}</StatHelpText>
+    </Stat>
+    <Stat>
+        <StatLabel>Change</StatLabel>
+        <StatNumber>${regularMarketChange.toFixed(2)}</StatNumber>
+        <StatArrow type={regularMarketChange > 0 ? 'increase' : 'decrease'} />
+        <StatHelpText>{regularMarketChangePercent.toFixed(2)}%</StatHelpText>
+    </Stat>
+    <Stat>
+        <StatLabel>High Today</StatLabel>
+        <StatNumber>${regularMarketDayHigh.toFixed(2)}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>Low Today</StatLabel>
+        <StatNumber>${regularMarketDayLow.toFixed(2)}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>Volume</StatLabel>
+        <StatNumber>{regularMarketVolume.toLocaleString()}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>Market Cap</StatLabel>
+        <StatNumber>${marketCap.toLocaleString()}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>P/E Ratio</StatLabel>
+        <StatNumber>{trailingPE.toFixed(2)}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>52 Week High</StatLabel>
+        <StatNumber>${fiftyTwoWeekHigh.toFixed(2)}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>52 Week Low</StatLabel>
+        <StatNumber>${fiftyTwoWeekLow.toFixed(2)}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>YTD Change</StatLabel>
+        <StatNumber>{ytdChange ? `${ytdChange.toFixed(2)}%` : 'N/A'}</StatNumber>
+    </Stat>
+    <Stat>
+        <StatLabel>Market Status</StatLabel>
+        <StatNumber>{isUSMarketOpen ? 'Open' : 'Closed'}</StatNumber>
+    </Stat>
           </Box>
         </Collapse>
       </Box>

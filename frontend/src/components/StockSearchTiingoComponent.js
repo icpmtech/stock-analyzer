@@ -11,6 +11,7 @@ import {
 import MarketNewsFeed from './MarketNewsFeed';
 import StockChart from './StockChart';
  import StockStats from './StockStats';
+import StockPrice from './utils/StockPrice';
  
 const StockSearchComponent = () => {
     const [searchQuery, setSearchQuery] = useState('AAPL');
@@ -98,7 +99,7 @@ const StockSearchComponent = () => {
         setLoading(true);
         
         try {
-            const response = await axios.get(`http://localhost:3001/api/stock/${stock.symbol}`);
+            const response = await axios.get(`http://localhost:3001/api/stock-quote/${stock.symbol}`);
             setResults(response.data);
             setShowResults(true);
         } catch (err) {
@@ -147,14 +148,16 @@ const StockSearchComponent = () => {
         my={6}
       >
         <GridItem >
-          <Heading mb={4}>Market News: ({results?.companyName})</Heading>
+          <Heading mb={4}>Market News: ({results?.shortName})</Heading>
           <MarketNewsFeed newsList={marketNews} />
         </GridItem>
         <GridItem >
           <Heading mb={4}>Stock Summary</Heading>
           {showResults && results && (
             <> <StockStats stockData={results} ></StockStats>
-            <StockChart symbol={searchQuery} /></> 
+            <StockChart symbol={searchQuery} />
+          
+            </> 
             )}
         </GridItem>
       </Grid>

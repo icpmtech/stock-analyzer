@@ -50,8 +50,9 @@ const Home = () => {
         change: stockData.length > 0 ? stockData[0].change : 'Loading...',
         isPositive: stockData.length > 0 && parseFloat(stockData[0].change) >= 0,
       }]} />
+      
        <StockSearchTiingoComponent   />
-    
+       
     </Box>
   );
 };
