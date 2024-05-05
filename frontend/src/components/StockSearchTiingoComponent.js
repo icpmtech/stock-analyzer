@@ -118,7 +118,7 @@ const StockSearchComponent = () => {
             <SearchBar value={searchQuery} onChange={(e) => {
                 setSearchQuery(e);
                 handleSearch(e);
-            }} onSearch={() => handleSearch(searchQuery)} />
+            }} onSearch={() => handleSearch(searchQuery)}  loading={loading} />
             {loading && <Text>Loading...</Text>}
             {error && (
                 <Alert status="error" mt={4}>

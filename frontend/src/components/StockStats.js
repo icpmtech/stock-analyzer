@@ -118,22 +118,22 @@ const StockStats = ({ stockData }) => {
     </Stat>
     <Stat>
         <StatLabel>Latest Price</StatLabel>
-        <StatNumber>${regularMarketPrice.toFixed(2)}</StatNumber>
+        <StatNumber>${regularMarketPrice?.toFixed(2)}</StatNumber>
         <StatHelpText>{new Date(regularMarketTime * 1000).toLocaleString()}</StatHelpText>
     </Stat>
     <Stat>
         <StatLabel>Change</StatLabel>
-        <StatNumber>${regularMarketChange.toFixed(2)}</StatNumber>
+        <StatNumber>${regularMarketChange?.toFixed(2)}</StatNumber>
         <StatArrow type={regularMarketChange > 0 ? 'increase' : 'decrease'} />
-        <StatHelpText>{regularMarketChangePercent.toFixed(2)}%</StatHelpText>
+        <StatHelpText>{regularMarketChangePercent?.toFixed(2)}%</StatHelpText>
     </Stat>
     <Stat>
         <StatLabel>High Today</StatLabel>
-        <StatNumber>${regularMarketDayHigh.toFixed(2)}</StatNumber>
+        <StatNumber>${regularMarketDayHigh?.toFixed(2)}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>Low Today</StatLabel>
-        <StatNumber>${regularMarketDayLow.toFixed(2)}</StatNumber>
+        <StatNumber>${regularMarketDayLow?.toFixed(2)}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>Volume</StatLabel>
@@ -145,19 +145,19 @@ const StockStats = ({ stockData }) => {
     </Stat>
     <Stat>
         <StatLabel>P/E Ratio</StatLabel>
-        <StatNumber>{trailingPE.toFixed(2)}</StatNumber>
+        <StatNumber>{trailingPE?.toFixed(2)}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>52 Week High</StatLabel>
-        <StatNumber>${fiftyTwoWeekHigh.toFixed(2)}</StatNumber>
+        <StatNumber>${fiftyTwoWeekHigh?.toFixed(2)}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>52 Week Low</StatLabel>
-        <StatNumber>${fiftyTwoWeekLow.toFixed(2)}</StatNumber>
+        <StatNumber>${fiftyTwoWeekLow?.toFixed(2)}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>YTD Change</StatLabel>
-        <StatNumber>{ytdChange ? `${ytdChange.toFixed(2)}%` : 'N/A'}</StatNumber>
+        <StatNumber>{ytdChange ? `${ytdChange?.toFixed(2)}%` : 'N/A'}</StatNumber>
     </Stat>
     <Stat>
         <StatLabel>Market Status</StatLabel>
