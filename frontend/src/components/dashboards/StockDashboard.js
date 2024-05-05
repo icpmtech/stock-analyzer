@@ -4,17 +4,11 @@ import {
   Box, Text, Button, Alert, AlertIcon, AlertTitle, AlertDescription,
   Grid, GridItem, Heading, Collapse, IconButton, useColorModeValue
 } from '@chakra-ui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
-import { Chart as ChartJS, registerables } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 
-import { fetchStockData, prepareChartData } from '../StockDataUtils'; // Ensure these are properly exported
 import SearchBar from '../SearchBar';
-import MarketNewsFeed from '../MarketNewsFeed';
 import StockChart from '../StockChart';
 import StockStats from '../StockStats';
 
-ChartJS.register(...registerables);
 
 const StockDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -146,33 +140,20 @@ const StockDashboard = () => {
       )}
 
       <Grid
-        templateColumns={{ md: '3fr 1fr', base: '1fr' }}
+        templateColumns={{ md: ' 1fr', base: '1fr' }}
         gap={4}
         my={6}
       >
-        <GridItem>
-        <Heading mb={4}>Market News: ({results?.shortName})</Heading>
-          <MarketNewsFeed newsList={marketNews} />
-        </GridItem>
         <GridItem>
           <Heading mb={4}>Stock Summary</Heading>
           {showResults && results && (
             <Box>
               <StockStats stockData={results} />
-              <IconButton
-                icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                aria-label={isOpen ? 'Collapse' : 'Expand'}
-                onClick={toggleCollapse}
-                variant="ghost"
-                size="sm"
-              />
-              <Collapse in={isOpen} animateOpacity>
                 <Box mt="4">
                   {loading && <Text>Loading...</Text>}
                   {error && <Text>Error: {error}</Text>}
                   {results && <StockChart symbol={searchQuery} />}
                 </Box>
-              </Collapse>
             </Box>
           )}
         </GridItem>

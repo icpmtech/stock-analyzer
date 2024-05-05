@@ -8,7 +8,8 @@ const StockStats = ({ stockData }) => {
   const [dividendsInformation, setDividendsInformation] = useState({ dividends: [] }); // Initialize with empty array for dividends
   const [isOpenDescription, setIsOpenDescription] = useState(false);
   const [isOpenStatistics, setIsOpenStatistics] = useState(false);
-
+  const [isOpenDividends, setIsOpenDividends] = useState(false);
+  
   useEffect(() => {
     const fetchInformation = async (endpoint, message, setState) => {
       try {
@@ -42,6 +43,11 @@ const StockStats = ({ stockData }) => {
   const toggleStatisticsCollapse = () => {
     setIsOpenStatistics(!isOpenStatistics);
   };
+  const toggleDividendsCollapse = () => {
+    setIsOpenDividends(!isOpenDividends);
+  };
+
+  
 
   const {
     shortName,
@@ -67,10 +73,19 @@ const StockStats = ({ stockData }) => {
       </Box>
       <Divider my="2" />
       <Box>
-      <Text fontSize="xl" fontWeight="bold">Dividends</Text>
+      <Text fontSize="xl" fontWeight="bold"></Text>
+      <IconButton
+       icon={isOpenDividends ? <><Text fontSize="lg" fontWeight="bold">Dividends</Text> <ChevronUpIcon /></> : <><Text fontSize="lg" fontWeight="bold">Dividends</Text> <ChevronDownIcon /></>}
+       aria-label={isOpenDividends ? 'Collapse' : 'Expand'}
+       onClick={toggleDividendsCollapse}
+       variant="ghost"
+       size="sm"
+     />
       <Divider my="2" />
       {/* Check if dividends array is available before rendering DividendList */}
-      {dividendsInformation.dividends && <DividendList dividends={dividendsInformation.dividends} />}
+      {dividendsInformation.dividends && 
+     <Collapse in={isOpenDividends} animateOpacity>  <DividendList dividends={dividendsInformation.dividends} /></Collapse>
+      }
       </Box>
       <Box mb="4">
         <IconButton

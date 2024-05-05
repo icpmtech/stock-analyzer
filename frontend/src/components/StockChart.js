@@ -1,68 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, Collapse, IconButton } from '@chakra-ui/react';
+import { Box, Text, Collapse, IconButton, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
 import { Line } from 'react-chartjs-2';
-
-import { fetchStockData, prepareChartData } from './StockDataUtils'; // Ensure these are properly exported
-
-ChartJS.register(...registerables);
+import { fetchStockData, prepareChartData } from './StockDataUtils';
+import zoomPlugin from 'chartjs-plugin-zoom';
+ChartJS.register(...registerables,zoomPlugin);
 
 const StockChart = ({ symbol }) => {
-  const [chartData, setChartData] = useState(null); // Initialize to null for conditional rendering
-  const [loading, setLoading] = useState(true); // Track loading state
-  const [error, setError] = useState(null); // Track error state
-  const [isOpen, setIsOpen] = useState(false); // Track collapse state
+  const [chartDatas, setChartDatas] = useState({}); // Manage multiple datasets
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [timeFrame, setTimeFrame] = useState('1D'); // Default time frame
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true); // Begin loading
+      setLoading(true);
+      setError(null);
       try {
-        const rawData = await fetchStockData(symbol);
+        const rawData = await fetchStockData(symbol, timeFrame);
         if (rawData) {
-          // Check if rawData is not null or undefined
           const data = prepareChartData(rawData);
-          setChartData(data);
-          setError(null); // Reset error state on successful load
+          setChartDatas(prevDatas => ({ ...prevDatas, [timeFrame]: data })); // Store data indexed by timeFrame
         } else {
-          throw new Error('No data returned'); // Handle case where no data is returned
+          throw new Error('No data returned');
         }
       } catch (err) {
-        setError(err.message); // Set error message
-        setChartData(null); // Reset chart data on error
+        setError(err.message);
       } finally {
-        setLoading(false); // End loading regardless of result
+        setLoading(false);
       }
     };
 
     loadData();
-  }, [symbol]); // Dependency array includes symbol to reload data when it changes
+  }, [symbol, timeFrame]); // Reload data when symbol or time frame changes
 
-  const toggleCollapse = () => {
-    setIsOpen(!isOpen);
+  const handleTabChange = (index) => {
+    const frames = ['1D', '1M', '52W', 'ALL'];
+    setTimeFrame(frames[index]);
   };
-
+  const options = {
+    scales: {
+      'y-axis-open': {
+        type: 'linear',
+        position: 'left',
+      },
+      'y-axis-high': {
+        type: 'linear',
+        position: 'right',
+        grid: { drawOnChartArea: false },
+      },
+      'y-axis-low': {
+        type: 'linear',
+        position: 'right',
+        grid: { drawOnChartArea: false },
+      },
+      'y-axis-close': {
+        type: 'linear',
+        position: 'left',
+      },
+      'y-axis-adjusted': {
+        type: 'linear',
+        position: 'right',
+        grid: { drawOnChartArea: false },
+      },
+      'y-axis-volume': {
+        type: 'linear',
+        position: 'right',
+        grid: { drawOnChartArea: false },
+      }
+    },
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true, // Enable zooming with mouse wheel
+          },
+          pinch: {
+            enabled: true // Enable zooming with pinch gestures
+          },
+          mode: 'xy' // Enable zooming in both directions
+        },
+        pan: {
+          enabled: true,
+          mode: 'xy' // Enable panning in both directions
+        }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+      },
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    }
+  };
+  
   return (
     <Box borderWidth="1px" borderRadius="lg" p="4">
-      <Box mb="4">
-        <IconButton
-          icon={isOpen ? <><Text fontSize="lg" fontWeight="bold">Stock Chart</Text> <ChevronUpIcon /></> : <><Text fontSize="lg" fontWeight="bold">Stock Chart</Text> <ChevronDownIcon /></>}
-          aria-label={isOpen ? 'Collapse' : 'Expand'}
-          onClick={toggleCollapse}
-          variant="ghost"
-          size="sm"
-        />
-      </Box>
-      <Collapse in={isOpen} animateOpacity>
-        <Box mt="4">
-          <div>
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error}</p>}
-            {chartData && <Line data={chartData} />}
-          </div>
-        </Box>
-      </Collapse>
+      <Tabs variant='unstyled' onChange={handleTabChange}>
+        <TabList>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>1D</Tab>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>1M</Tab>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>52 Weeks</Tab>
+          <Tab _selected={{ color: 'white', bg: 'blue.500' }}>All</Tab>
+        </TabList>
+        <TabPanels>
+          {['1D', '1M', '52W', 'ALL'].map((frame, index) => (
+            <TabPanel key={index}>
+              <IconButton
+                icon={isOpen ? <><Text fontSize="lg" fontWeight="bold">Stock Chart</Text> <ChevronUpIcon /></> : <><Text fontSize="lg" fontWeight="bold">Stock Chart</Text> <ChevronDownIcon /></>}
+                aria-label={isOpen ? 'Collapse' : 'Expand'}
+                onClick={() => setIsOpen(!isOpen)}
+                variant="ghost"
+                size="sm"
+              />
+              <Collapse in={isOpen} animateOpacity>
+                <Box borderWidth="1px" borderRadius="lg" p="4" mt="4">
+                  {loading && <Text>Loading...</Text>}
+                  {error && <Text>Error: {error}</Text>}
+                  {chartDatas[frame] && <Line options={options} data={chartDatas[frame]} />}
+                </Box>
+              </Collapse>
+            </TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 };
