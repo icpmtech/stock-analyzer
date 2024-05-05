@@ -85,7 +85,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - [@CantinhodeNet](https://twitter.com/CantinhodeNet) - academy@cantinhode.net
+Cantinhode.net - [@CantinhodeNet](https://twitter.com/CantinhodeNet) - academy@cantinhode.net
 
 Project Link: [https://github.com/icpmtech/stock-analyzer](https://github.com/icpmtech/stock-analyzer)
 
