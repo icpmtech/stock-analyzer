@@ -9,7 +9,7 @@ import WeatherWidget from "./components/WeatherWidget";
 import FinanceWidget from "./components/FinanceWidget";
 import Footer from "./components/Footer";
 import Home from './components/Home';
-import StockChart from './components/StockChart';
+import StockDashboard  from './components/dashboards/StockDashboard';
 import StockHoldings from './components/StockHoldings';
 import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
@@ -40,7 +40,7 @@ function App() {
         <Route path="/news" element={<NewsFeed />} />
         <Route path="/finance" element={<FinanceWidget />} />
         <Route path="/weather" element={<WeatherWidget />} />
-        <Route path="/stock-chart" element={<StockChart symbol="AAPL" />} />
+        <Route path="/stock-chart" element={<StockDashboard  symbol="AAPL" />} />
         <Route path="/holdings" element={  <StockHoldings holdingsData={holdingsData} /> } />
         <Route path="/login" element={  <LoginForm /> } />
         <Route path="/register" element={  <RegisterForm /> } />

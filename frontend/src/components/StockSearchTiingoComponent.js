@@ -11,7 +11,6 @@ import {
 import MarketNewsFeed from './MarketNewsFeed';
 import StockChart from './StockChart';
  import StockStats from './StockStats';
-import StockPrice from './utils/StockPrice';
  
 const StockSearchComponent = () => {
     const [searchQuery, setSearchQuery] = useState('AAPL');
