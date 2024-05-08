@@ -25,7 +25,7 @@ const fetchStockData = async (symbol, timeFrame = 'daily') => {
       console.log('Defaulting to daily time series');
   }
 
-  const url = `https://www.alphavantage.co/query?function=${functionType}&symbol=${symbol}&apikey=${apiKey}`;
+  const url = `https://www.alphavantage.co/query?function=${functionType}&symbol=${symbol}&apikey=${API_KEY}`;
 
   try {
    const labelTimeSeries= functionType.split('_')[2];

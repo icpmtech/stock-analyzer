@@ -31,7 +31,7 @@ const Home = () => {
           symbol: 'AAPL',
           name: 'Apple Inc.',
           price: latestData['4. close'], // Adjust these keys based on API response
-          change: `${(latestData['4. close'] - latestData['1. open']).toFixed(2)} (${((latestData['4. close'] - latestData['1. open']) / latestData['1. open'] * 100).toFixed(2)}%)`,
+          change: `${(latestData['4. close'] - latestData['1. open'])?.toFixed(2)} (${((latestData['4. close'] - latestData['1. open']) / latestData['1. open'] * 100)?.toFixed(2)}%)`,
         }]);
       } catch (error) {
         console.error('Error fetching stock data:', error);

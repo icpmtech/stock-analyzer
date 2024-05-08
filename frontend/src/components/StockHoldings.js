@@ -1,25 +1,27 @@
 import React,{ useState, useEffect }  from 'react';
+import axios from 'axios'; // Import axios
 import { Box,Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import PortfolioStats  from  './portfolio/PortfolioStats';
 import PortfolioFundamentals  from  './portfolio/PortfolioFundamentals';
 import PortfolioHoldings  from  './portfolio/PortfolioHoldings';
 import PortfolioSummary  from  './portfolio/PortfolioSummary';
-const StockHoldings = ({holdingsData}) => {
+const StockHoldings = () => {
 
-  const [holdings, setHoldings] = useState(holdingsData);
+  const [holdings, setHoldings] = useState([]); // Initialize state for holdings data
 
-  // Load data from local storage when the component mounts
   useEffect(() => {
-    const loadedHoldings = localStorage.getItem('holdingsData');
-    if (loadedHoldings) {
-      setHoldings(JSON.parse(loadedHoldings));
-    }
-  }, []);
+    const fetchHoldings = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/portfolioHoldings'); // Adjust URL as necessary
+        setHoldings(response.data); // Set state with fetched data
+      } catch (error) {
+        console.error('Failed to fetch holdings:', error);
+      }
+    };
 
-  // Save data to local storage when `holdings` changes
-  useEffect(() => {
-    localStorage.setItem('holdingsData', JSON.stringify(holdings));
-  }, [holdings]);
+    fetchHoldings();
+  }, []); // Empty dependency array ensures this runs once on mount
+
 
   const statsData = {
     cashHoldings: 6287.89,
@@ -86,7 +88,7 @@ const StockHoldings = ({holdingsData}) => {
     <PortfolioHoldings holdings={holdings} />
     </TabPanel>
     <TabPanel>
-    <PortfolioFundamentals holdings={stockData} />
+    <PortfolioFundamentals holdings={stockData} setHoldings={setHoldings} />
     </TabPanel>
   </TabPanels>
 </Tabs>

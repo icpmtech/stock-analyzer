@@ -91,7 +91,7 @@ function Header() {
       
       top={0}
      
-      viewportboxShadow="md">
+      >
       <Text fontSize="lg" fontWeight="bold" color="white">Stock Analizer</Text>
       <NotificationHeader />
     </Flex></>
