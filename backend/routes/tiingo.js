@@ -46,7 +46,7 @@ const NASDAQ_API_KEY = process.env.NASDAQ_API_KEY;
  *         description: Internal server error
  */
 
-router.get('/daily/:symbol', async (req, res) => {
+router.get('/tiingo/daily/:symbol', async (req, res) => {
     const { symbol } = req.params;
     const url = `https://api.tiingo.com/tiingo/daily/${symbol}?token=${process.env.TIINGO_API_KEY}`;
 
@@ -108,7 +108,7 @@ router.get('/daily/:symbol', async (req, res) => {
  *                 details:
  *                   type: string
  */
-router.get('/api/stocks', async (req, res) => {
+router.get('/stocks', async (req, res) => {
     const query = req.query.query || ''; // Default to an empty string if no query is provided
     const url = `https://api.tiingo.com/tiingo/utilities/search?query=${query}&token=${process.env.TIINGO_API_KEY}`;
     
@@ -149,7 +149,7 @@ router.get('/api/stocks', async (req, res) => {
  *         description: Failed to fetch data
  */
 
-router.get('/api/stock-details/:symbol', async (req, res) => {
+router.get('/stock-details/:symbol', async (req, res) => {
     const symbol = req.params.symbol;
     const detailsUrl = `https://api.tiingo.com/tiingo/daily/${symbol}/prices?token=${process.env.TIINGO_API_KEY}`;
     const newsUrl = `https://api.tiingo.com/tiingo/news?tickers=${symbol}&token=${process.env.TIINGO_API_KEY}`;
@@ -204,7 +204,7 @@ router.get('/api/stock-details/:symbol', async (req, res) => {
  *         description: Error fetching data
  */
 
-router.get('/api/search-stocks', async (req, res) => {
+router.get('/search-stocks', async (req, res) => {
     const searchQuery = req.query.q;
     if (!searchQuery) {
         return res.status(400).json({ message: 'Query parameter "q" is required' });

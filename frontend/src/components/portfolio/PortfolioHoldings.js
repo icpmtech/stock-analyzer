@@ -1,212 +1,372 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Box, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Button, Input,
+  Alert, AlertIcon, AlertTitle, AlertDescription,
+  AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader,
+  AlertDialogBody, AlertDialogFooter, Divider
+} from '@chakra-ui/react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react';
+import { EditIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons';
 
-import React, { useState } from 'react';
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  IconButton,
-  useDisclosure,
-  Collapse,
-  Input,
-  Button,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Divider
-} from '@chakra-ui/react';
-import { ChevronUpIcon, ChevronDownIcon, EditIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import {
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
-  StatGroup,
-} from '@chakra-ui/react';
-const PortfolioHoldings = ({ holdings }) => {
-  const [editIndex, setEditIndex] = useState(null);
+const PortfolioHoldings = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [holdings, setHoldings] = useState([]);
   const [editedHolding, setEditedHolding] = useState({});
-  const [deleteIndex, setDeleteIndex] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState('');
+  const [error, setError] = useState('');
   const [isCreateMode, setIsCreateMode] = useState(false);
-  const { isOpen, onToggle } = useDisclosure();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const handleEdit = (index, holding) => {
-    setEditIndex(index);
+  useEffect(() => {
+    fetchHoldings();
+  }, []);
+
+  const fetchHoldings = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/portfolioHoldings');
+      setHoldings(response.data);
+    } catch (error) {
+      console.error('Failed to fetch holdings:', error);
+      setError('Failed to fetch holdings');
+    }
+  };
+
+  const handleEdit = (holding) => {
     setEditedHolding({ ...holding });
+    setDialogType('edit');
+    setIsDialogOpen(true);
   };
 
-  const handleSaveEdit = (index) => {
-    // Get existing holdings from local storage
-    const existingHoldings = JSON.parse(localStorage.getItem('holdingsData')) || [];
-  
-    // Update the holding at the specified index with the edited holding
-    existingHoldings[index] = editedHolding;
-  
-    // Update local storage with the updated holdings array
-    localStorage.setItem('holdingsData', JSON.stringify(existingHoldings));
-  
-    // Clear the edit index
-    setEditIndex(null);
-  };
-  
-
-  const handleCancelEdit = () => {
-    setEditIndex(null);
+  const handleDelete = (id) => {
+    setEditedHolding({ _id: id });
+    setDialogType('delete');
+    setIsDialogOpen(true);
   };
 
-  const handleDelete = (index) => {
-    setDeleteIndex(index);
-    setIsDeleteDialogOpen(true);
+  const saveChanges = async () => {
+    const method = editedHolding._id ? 'put' : 'post';
+    const url = `http://localhost:3001/portfolioHoldings/${editedHolding._id || ''}`;
+    try {
+      await axios[method](url, editedHolding);
+      fetchHoldings();
+      setIsDialogOpen(false);
+      setEditedHolding({});
+    } catch (error) {
+      console.error('API request failed:', error);
+      setError('Failed to save changes');
+    }
   };
 
-  const handleConfirmDelete = () => {
-    // Perform delete operation here
-    setIsDeleteDialogOpen(false);
-    setDeleteIndex(null);
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteDialogOpen(false);
-    setDeleteIndex(null);
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/portfolioHoldings/${editedHolding._id}`);
+      fetchHoldings();
+      setIsDialogOpen(false);
+      setEditedHolding({});
+    } catch (error) {
+      console.error('API request failed:', error);
+      setError('Failed to delete holding');
+    }
   };
 
   const handleCreate = () => {
     setIsCreateMode(true);
+    setEditedHolding({
+      symbol: '',
+      status: '',
+      shares: 0,
+      lastPrice: 0,
+      avgCost: 0,
+      totalCost: 0,
+      marketValue: 0,
+      totalDividendIncome: '--',
+      todaysGain: '',
+      totalGain: '',
+      totalReturn: '--',
+      marketValueTrend: []
+    });
   };
 
-  const handleSaveCreate = () => {
-    // Get existing holdings from local storage or initialize an empty array if no data exists
-    const existingHoldings = JSON.parse(localStorage.getItem('holdingsData')) || [];
-  
-    // Add the new holding to the existing holdings array
-    const updatedHoldings = [...existingHoldings, editedHolding];
-  
-    // Update local storage with the updated holdings array
-    localStorage.setItem('holdingsData', JSON.stringify(updatedHoldings));
-  
-    // Exit create mode
-    setIsCreateMode(false);
+  const handleInputChange = (e) => {
+    setEditedHolding({ ...editedHolding, [e.target.name]: e.target.value });
   };
-  
+
+  const handleClose = () => {
+    setIsDialogOpen(false);
+    setEditedHolding({});
+    setError('');
+  };
+  const handleSaveCreate = async () => {
+    try {
+      await axios.post('http://localhost:3001/portfolioHoldings', editedHolding);
+      fetchHoldings();
+      setIsCreateMode(false);
+      setEditedHolding({});
+      handleCloseCreateModal();
+    } catch (error) {
+      console.error('API request failed:', error);
+      setError('Failed to save new holding');
+    }
+  };
 
   const handleCancelCreate = () => {
     setIsCreateMode(false);
+    setEditedHolding({});
   };
+  const handleOpenCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+ 
   return (
-   
     <>
-    {!isCreateMode && (
-      <Button onClick={handleCreate} mt={4} leftIcon={<AddIcon />} colorScheme="blue">
-        Add Holding
-      </Button>
-    )}
-    {isCreateMode && (
-      <Box mt={4}>
-        <Input placeholder="Symbol" value={editedHolding.symbol} onChange={(e) => setEditedHolding({ ...editedHolding, symbol: e.target.value })} />
-        <Input placeholder="Status" value={editedHolding.status} onChange={(e) => setEditedHolding({ ...editedHolding, status: e.target.value })} mt={2} />
-        <Button onClick={handleSaveCreate} mt={2} colorScheme="teal">Save</Button>
-        <Button onClick={handleCancelCreate} mt={2} ml={2} colorScheme="gray">Cancel</Button>
-      </Box>
-    )}
-    <Divider padding='2' />
-    <Box p={5} shadow="md" borderWidth="1px" flex="1" borderRadius="md">
+      {error && (
+        <Alert status="error">
+          <AlertIcon />
+          <Box flex="1">
+            <AlertTitle>Error!</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Box>
+          <Button onClick={() => setError('')}>Close</Button>
+        </Alert>
+      )}
+      {!isCreateMode && (
+        <Button onClick={handleOpenCreateModal} mt={4} leftIcon={<AddIcon />} colorScheme="blue">
+          Add Holding
+        </Button>
+      )}
+      
+         <Modal isOpen={isCreateModalOpen} onClose={handleCloseCreateModal}>
+         <ModalOverlay />
+         <ModalContent>
+           <ModalHeader>Create New Holding</ModalHeader>
+           <ModalCloseButton />
+           <ModalBody>
+            <Box mt={4}>
+            <Input
+              placeholder="Symbol"
+              value={editedHolding.symbol}
+              onChange={(e) => setEditedHolding({ ...editedHolding, symbol: e.target.value })}
+            />
+            <Input
+              placeholder="Status"
+              value={editedHolding.status}
+              onChange={(e) => setEditedHolding({ ...editedHolding, status: e.target.value })}
+              mt={2}
+            />
+            <Input
+              placeholder="Shares"
+              value={editedHolding.shares}
+              onChange={(e) => setEditedHolding({ ...editedHolding, shares: Number(e.target.value) })}
+              mt={2}
+            />
+            <Input
+              placeholder="Last Price"
+              value={editedHolding.lastPrice}
+              onChange={(e) => setEditedHolding({ ...editedHolding, lastPrice: Number(e.target.value) })}
+              mt={2}
+            />
+            <Input
+              placeholder="Average Cost"
+              value={editedHolding.avgCost}
+              onChange={(e) => setEditedHolding({ ...editedHolding, avgCost: Number(e.target.value) })}
+              mt={2}
+            />
+            <Input
+              placeholder="Market Value"
+              value={editedHolding.marketValue}
+              onChange={(e) => setEditedHolding({ ...editedHolding, marketValue: Number(e.target.value) })}
+              mt={2}
+            />
+            <Input
+              placeholder="Total Cost"
+              value={editedHolding.totalCost}
+              onChange={(e) => setEditedHolding({ ...editedHolding, totalCost: Number(e.target.value) })}
+              mt={2}
+            />
+            <Input
+              placeholder="Total Dividend Income"
+              value={editedHolding.totalDividendIncome}
+              onChange={(e) => setEditedHolding({ ...editedHolding, totalDividendIncome: e.target.value })}
+              mt={2}
+            />
+            <Input
+              placeholder="Today's Gain"
+              value={editedHolding.todaysGain}
+              onChange={(e) => setEditedHolding({ ...editedHolding, todaysGain: e.target.value })}
+              mt={2}
+            />
+            <Input
+              placeholder="Total Gain"
+              value={editedHolding.totalGain}
+              onChange={(e) => setEditedHolding({ ...editedHolding, totalGain: e.target.value })}
+              mt={2}
+            />
+            <Input
+              placeholder="Total Return"
+              value={editedHolding.totalReturn}
+              onChange={(e) => setEditedHolding({ ...editedHolding, totalReturn: e.target.value })}
+              mt={2}
+            />
+          
+          </Box> </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleSaveCreate}>
+              Save
+            </Button>
+            <Button onClick={handleCloseCreateModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    
+      <Divider my="4" />
       <TableContainer>
-        <Table size='sm' variant="simple">
+        <Table variant="simple">
           <Thead>
             <Tr>
               <Th>Symbol</Th>
               <Th>Status</Th>
               <Th isNumeric>Shares</Th>
               <Th isNumeric>Last Price</Th>
-              <Th isNumeric>Avg Cost / Share</Th>
+              <Th isNumeric>Avg Cost</Th>
               <Th isNumeric>Total Cost</Th>
               <Th isNumeric>Market Value</Th>
               <Th isNumeric>Total Dividend Income</Th>
-              <Th isNumeric>Today's Gain (Unrealized)</Th>
-              <Th isNumeric>Total Gain (Unrealized)</Th>
+              <Th isNumeric>Today's Gain</Th>
+              <Th isNumeric>Total Gain</Th>
               <Th isNumeric>Total Return</Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>
           <Tbody>
             {holdings.map((holding, index) => (
-              <React.Fragment key={index}>
-                <Tr>
-                  <Td>{editIndex === index || isCreateMode ? <Input value={editedHolding.symbol} onChange={(e) => setEditedHolding({ ...editedHolding, symbol: e.target.value })} /> : holding.symbol}</Td>
-                  <Td>{editIndex === index || isCreateMode ? <Input value={editedHolding.status} onChange={(e) => setEditedHolding({ ...editedHolding, status: e.target.value })} /> : holding.status}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.shares} onChange={(e) => setEditedHolding({ ...editedHolding, shares: e.target.value })} /> : holding.shares}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.lastPrice} onChange={(e) => setEditedHolding({ ...editedHolding, lastPrice: e.target.value })} /> : holding.lastPrice}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.avgCost} onChange={(e) => setEditedHolding({ ...editedHolding, avgCost: e.target.value })} /> : holding.avgCost}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.totalCost} onChange={(e) => setEditedHolding({ ...editedHolding, totalCost: e.target.value })} /> : holding.totalCost}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.marketValue} onChange={(e) => setEditedHolding({ ...editedHolding, marketValue: e.target.value })} /> : holding.marketValue}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.totalDividendIncome} onChange={(e) => setEditedHolding({ ...editedHolding, totalDividendIncome: e.target.value })} /> : holding.totalDividendIncome}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.todaysGain} onChange={(e) => setEditedHolding({ ...editedHolding, todaysGain: e.target.value })} /> : holding.todaysGain}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.totalGain} onChange={(e) => setEditedHolding({ ...editedHolding, totalGain: e.target.value })} /> : holding.totalGain}</Td>
-                  <Td isNumeric>{editIndex === index || isCreateMode ? <Input value={editedHolding.totalReturn} onChange={(e) => setEditedHolding({ ...editedHolding, totalReturn: e.target.value })} /> : holding.totalReturn}</Td>
-                  <Td>
-                    {editIndex === index ? (
-                      <>
-                        <Button colorScheme="teal" size="sm" onClick={() => handleSaveEdit(index)}>Save</Button>
-                        <Button colorScheme="gray" size="sm" onClick={handleCancelEdit}>Cancel</Button>
-                      </>
-                    ) : (
-                      <>
-                        <IconButton
-                          aria-label="Edit"
-                          icon={<EditIcon />}
-                          onClick={() => handleEdit(index, holding)}
-                          size="sm" />
-                        <IconButton
-                          aria-label="Delete"
-                          icon={<DeleteIcon />}
-                          onClick={() => handleDelete(index)}
-                          size="sm" />
-                      </>
-                    )}
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td colSpan="12">
-                    <Collapse in={deleteIndex === index}>
-                      <Box p={4} mt={2} shadow="md" borderWidth="1px">
-                        <AlertDialog isOpen={isDeleteDialogOpen} onClose={handleCancelDelete}>
-                          <AlertDialogOverlay>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>Delete Holding</AlertDialogHeader>
-                              <AlertDialogBody>
-                                Are you sure you want to delete this holding?
-                              </AlertDialogBody>
-                              <AlertDialogFooter>
-                                <Button colorScheme="red" onClick={handleConfirmDelete}>
-                                  Delete
-                                </Button>
-                                <Button onClick={handleCancelDelete} ml={3}>
-                                  Cancel
-                                </Button>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialogOverlay>
-                        </AlertDialog>
-                      </Box>
-                    </Collapse>
-                  </Td>
-                </Tr>
-              </React.Fragment>
+              <Tr key={holding._id}>
+                <Td>{holding.symbol}</Td>
+                <Td>{holding.status}</Td>
+                <Td isNumeric>{holding.shares}</Td>
+                <Td isNumeric>{holding.lastPrice}</Td>
+                <Td isNumeric>{holding.avgCost}</Td>
+                <Td isNumeric>{holding.totalCost}</Td>
+                <Td isNumeric>{holding.marketValue}</Td>
+                <Td isNumeric>{holding.totalDividendIncome}</Td>
+                <Td isNumeric>{holding.todaysGain}</Td>
+                <Td isNumeric>{holding.totalGain}</Td>
+                <Td isNumeric>{holding.totalReturn}</Td>
+                <Td>
+                  <IconButton icon={<EditIcon />} onClick={() => handleEdit(holding)} m="1" />
+                  <IconButton icon={<DeleteIcon />} onClick={() => handleDelete(holding._id)} m="1" />
+                </Td>
+              </Tr>
             ))}
           </Tbody>
         </Table>
       </TableContainer>
-    </Box></>
+
+      <AlertDialog isOpen={isDialogOpen} leastDestructiveRef={undefined} onClose={handleClose}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              {dialogType === 'delete' ? 'Delete Holding' : 'Edit Holding'}
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              {dialogType === 'delete' ? 
+                'Are you sure? You can\'t undo this action afterwards.' : 
+                (
+                  <Box mt={4}>
+                  <Input
+                    placeholder="Symbol"
+                    value={editedHolding.symbol}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, symbol: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Status"
+                    value={editedHolding.status}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, status: e.target.value })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Shares"
+                    value={editedHolding.shares}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, shares: Number(e.target.value) })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Last Price"
+                    value={editedHolding.lastPrice}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, lastPrice: Number(e.target.value) })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Average Cost"
+                    value={editedHolding.avgCost}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, avgCost: Number(e.target.value) })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Market Value"
+                    value={editedHolding.marketValue}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, marketValue: Number(e.target.value) })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Total Cost"
+                    value={editedHolding.totalCost}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, totalCost: Number(e.target.value) })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Total Dividend Income"
+                    value={editedHolding.totalDividendIncome}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, totalDividendIncome: e.target.value })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Today's Gain"
+                    value={editedHolding.todaysGain}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, todaysGain: e.target.value })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Total Gain"
+                    value={editedHolding.totalGain}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, totalGain: e.target.value })}
+                    mt={2}
+                  />
+                  <Input
+                    placeholder="Total Return"
+                    value={editedHolding.totalReturn}
+                    onChange={(e) => setEditedHolding({ ...editedHolding, totalReturn: e.target.value })}
+                    mt={2}
+                  />
+                  </Box>
+                )
+              }
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={undefined} onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={dialogType === 'delete' ? confirmDelete : saveChanges} ml={3}>
+                {dialogType === 'delete' ? 'Delete' : 'Save'}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
   );
 };
 

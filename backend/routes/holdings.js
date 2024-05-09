@@ -26,7 +26,7 @@ const openai = new OpenAI({
  *                 $ref: '#/components/schemas/Holding'
  */
 
-router.get('/api/holdings', async (req, res) => {
+router.get('/holdings', async (req, res) => {
     try {
         const holdings = await Holding.find();
         res.json(holdings);
@@ -56,7 +56,7 @@ router.get('/api/holdings', async (req, res) => {
  *               $ref: '#/components/schemas/Holding'
  */
 
-router.post('/api/holdings', async (req, res) => {
+router.post('/holdings', async (req, res) => {
     const newHolding = new Holding({
         symbol: req.body.symbol,
         lastPrice: req.body.lastPrice,
@@ -128,7 +128,7 @@ router.post('/api/holdings', async (req, res) => {
      *       500:
      *         description: Internal server error
      */
-router.get('/api/stock/:symbol', async (req, res) => {
+router.get('/stock/:symbol', async (req, res) => {
     const symbol = req.params.symbol;
     const token = process.env.IEX_API_TOKEN;
     try {
@@ -146,7 +146,7 @@ router.get('/api/stock/:symbol', async (req, res) => {
 });
 /**
  * @swagger
- * /openai/chat:
+ * /api/openai/chat:
  *   post:
  *     summary: Generate chat completion using OpenAI.
  *     requestBody:
@@ -195,7 +195,7 @@ router.post('/openai/chat', async (req, res) => {
 
 /**
  * @swagger
- * /search-dividends:
+ * /api/search-dividends:
  *   get:
  *     summary: List all dividends for a stock
  *     description: Retrieves a list of all dividend payments for a specified stock ticker, optionally from a specified start date.
@@ -267,7 +267,7 @@ router.get('/search-dividends', async (req, res) => {
 
 /**
  * @swagger
- * /stock-price/{symbol}:
+ * /api/stock-price/{symbol}:
  *   get:
  *     summary: Retrieve the current stock price
  *     description: Fetches the current market price of a stock based on the stock symbol provided in the URL path. This endpoint scrapes the price directly from Yahoo Finance.
@@ -354,7 +354,7 @@ router.get('/stock-price/:symbol', async (req, res) => {
  *                   type: string
  */
 
-  router.get('/api/stock-quote/:symbol', async (req, res) => {
+  router.get('/stock-quote/:symbol', async (req, res) => {
     const { symbol } = req.params;
     try {
       const quote = await yahooFinance.quote(symbol);

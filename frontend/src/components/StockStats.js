@@ -13,7 +13,7 @@ const StockStats = ({ stockData }) => {
   useEffect(() => {
     const fetchInformation = async (endpoint, message, setState) => {
       try {
-        const response = await fetch(`http://localhost:3001/openai/${endpoint}`, {
+        const response = await fetch(`http://localhost:3001/api/openai/${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
