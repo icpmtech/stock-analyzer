@@ -14,6 +14,7 @@ const nasdaqRouter = require('./routes/nasdaq');
 const newsapiRouter = require('./routes/newsapi');
 const newsRouter = require('./routes/news');
 const { options } = require('./options');
+const dividendsRoutes = require('./routes/dividends');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -31,6 +32,7 @@ app.use('/api/datasets', nasdaqRouter);
 app.use('/api/articles', newsapiRouter);
 app.use('/api/news', newsRouter);
 app.use('/portfolioHoldings', portfolioHoldingsRouter);
+app.use('/api', dividendsRoutes);
 
 app.listen(process.env.PORT || 3001, () => {
     console.log(`Server running on http://localhost:${process.env.PORT || 3001}`);

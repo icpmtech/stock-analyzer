@@ -5,6 +5,7 @@ import PortfolioStats  from  './portfolio/PortfolioStats';
 import PortfolioFundamentals  from  './portfolio/PortfolioFundamentals';
 import PortfolioHoldings  from  './portfolio/PortfolioHoldings';
 import PortfolioSummary  from  './portfolio/PortfolioSummary';
+import DividendCalendar from './portfolio/DividendCalendar'; // Import the component
 const StockHoldings = () => {
 
   const [holdings, setHoldings] = useState([]); // Initialize state for holdings data
@@ -79,6 +80,7 @@ const StockHoldings = () => {
     <Tab>Summary</Tab>
     <Tab>My Holdings</Tab>
     <Tab>Fundamentals</Tab>
+    <Tab>Calendar Dividends</Tab>
   </TabList>
   <TabPanels>
     <TabPanel>
@@ -89,6 +91,9 @@ const StockHoldings = () => {
     </TabPanel>
     <TabPanel>
     <PortfolioFundamentals holdings={stockData} setHoldings={setHoldings} />
+    </TabPanel>
+    <TabPanel>
+    <DividendCalendar></DividendCalendar>
     </TabPanel>
   </TabPanels>
 </Tabs>

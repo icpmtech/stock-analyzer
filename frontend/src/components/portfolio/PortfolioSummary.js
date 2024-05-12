@@ -78,6 +78,7 @@ const PortfolioSummary = ({ holdings }) => {
           </Tbody>
         </Table>
       </TableContainer>
+   
     </Box>
   );
 };
