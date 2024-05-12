@@ -144,6 +144,74 @@ const options = {
                         }
                     },
                     required: ['symbol', 'status', 'shares', 'lastPrice', 'avgCost', 'totalCost', 'marketValue', 'todaysGain', 'totalGain'] // Adjust based on your requirements
+                },
+                PortfolioDividend: {
+                    type: "object",
+                    required: [
+                        "symbol",
+                        "status",
+                        "shares",
+                        "lastPrice",
+                        "avgCost",
+                        "todaysGain",
+                        "totalGain",
+                        "divPaymentDate",
+                        "exDivDate",
+                        "divPerShare"
+                    ],
+                    properties: {
+                        symbol: {
+                            type: "string",
+                            example: "AAPL"
+                        },
+                        status: {
+                            type: "string",
+                            enum: ["Open", "Closed", "Pending"],
+                            example: "Open"
+                        },
+                        shares: {
+                            type: "number",
+                            example: 50
+                        },
+                        lastPrice: {
+                            type: "number",
+                            example: 150.00
+                        },
+                        avgCost: {
+                            type: "number",
+                            example: 145.00
+                        },
+                        totalDividendIncome: {
+                            type: "string",
+                            default: "--",
+                            example: "500.00"
+                        },
+                        todaysGain: {
+                            type: "string",
+                            example: "5%"
+                        },
+                        totalGain: {
+                            type: "string",
+                            example: "10%"
+                        },
+                        totalReturn: {
+                            type: "string",
+                            default: "--",
+                            example: "15%"
+                        },
+                        divPaymentDate: {
+                            type: "string",
+                            example: "2021-06-15"
+                        },
+                        exDivDate: {
+                            type: "string",
+                            example: "2021-06-01"
+                        },
+                        divPerShare: {
+                            type: "string",
+                            example: "0.82"
+                        }
+                    }
                 }
             }
         }
